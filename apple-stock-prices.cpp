@@ -17,26 +17,31 @@ int getMaxProfit(vector <int> stockPrices)
 			buyIndex = i;
 			buyValue = stockPrices[i];
 		}
-        for (int j = i+1; j < stockPrices.size(); j++)
+        else if (stockPrices[i] > buyValue)
         {
-            profit = stockPrices[j] - buyValue;
-
+            profit = stockPrices[i] - buyValue;
             if (profit > maxProfit)
             {
-                sellValue = stockPrices[j];
                 maxProfit = profit;
-                sellIndex = j;
+                sellIndex = i;
+                sellValue = stockPrices[i];
             }
         }
 	}
-    cout << "Buy: " << buyValue << endl;
-    cout << "Sell: " << sellValue << endl;
-    cout << "Profit: " << maxProfit << endl;
+    
+    if (maxProfit == 0)
+        cout << "Don't buy or sell today, market is down" << endl;
+    else
+    {
+        cout << "Buy: " << buyValue << endl;
+        cout << "Sell: " << sellValue << endl;
+        cout << "Profit: " << maxProfit << endl;
+    }
 	return maxProfit;
 }
 
 int main() {
-	vector<int> stockPricesYesterday{10, 7, 5, 8, 11, 9};
-	cout << getMaxProfit(stockPricesYesterday) << endl;
+	vector<int> stockPricesYesterday{10, 7, 5, 11, 8, 9};
+    getMaxProfit(stockPricesYesterday);
 	// returns 6 (buying for $5 and selling for $11)
 }
