@@ -5,6 +5,11 @@ using namespace std;
 
 int getMaxProfit(vector <int> stockPrices)
 {
+   // make sure we have at least 2 prices
+    if (stockPricesYesterday.size() < 2) {
+        throw invalid_argument("Getting a profit requires at least 2 prices");
+    }
+	
 	int sellIndex, sellValue = 0;
 	int buyIndex = stockPrices.size() - 1;
 	int buyValue = 9999999;
