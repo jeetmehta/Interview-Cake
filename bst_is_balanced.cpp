@@ -38,32 +38,31 @@ public:
 };
 
 
-void isBalanced(BinaryTreeNode* root, vector <int> &depths, int depth)
+bool isBalanced(BinaryTreeNode* root, int depth, int &maxDepth, int &minDepth)
 {
     bool isBalancedBST = true;
     
     if (root == 0)
-        return;
+        return true;
     else if (root->left_ == 0 && root->right_ == 0)
     {
-        depths.push_back(depth);
-        return;
+        if (depth > maxDepth)
+            maxDepth = depth;
+        
+        if (depth < minDepth)
+            minDepth = depth;
+        
+        if (maxDepth - minDepth > 1)
+            return false;
+        return true;
     }
     else
     {
-        isBalanced(root->left_, depths, ++depth);
-        
-        isBalanced(root->right_, depths, depth);
+        isBalancedBST = isBalanced(root->left_, ++depth, maxDepth, minDepth);
+        if (isBalancedBST)
+            isBalancedBST = isBalanced(root->right_, depth, maxDepth, minDepth);
     }
-}
-
-void print_vector(vector <int> arr)
-{
-    for (int i = 0; i < arr.size(); i++)
-    {
-        cout << arr[i] << " ";
-    }
-    cout << endl;
+    return isBalancedBST;
 }
 
 int main()
@@ -73,22 +72,10 @@ int main()
     BinaryTreeNode* right = root->insertRight(10);
     BinaryTreeNode* furtherLeft = left->insertLeft(5);
     BinaryTreeNode* leftLeaf = furtherLeft->insertLeft(3);
-
-    vector <int> depths;
-    isBalanced(root, depths, 0);
-    print_vector(depths);
-    for (int i = 0; i < depths.size(); i++)
-    {
-        for (int j = 0; j < depths.size(); j++)
-        {
-            int difference = depths[j] - depths[i];
-            if (difference > 1)
-            {
-                cout << "Tree is Not Balanced" << endl;
-                return 0;
-            }
-        }
-    }
-    cout << "Tree is Balanced" << endl;
+    
+    int initDepth = 0;
+    int initMaxDepth = 0;
+    int initMinDepth = 99999;
+    cout << (isBalanced(root, initDepth, initMaxDepth, initMinDepth) ? "Tree is Balanced" : "Tree is Not Balanced") << endl;
     return 0;
 }
