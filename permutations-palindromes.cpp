@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <algorithm>
 #include <string>
 
@@ -7,26 +8,17 @@ using namespace std;
 
 bool isPermutationPalindrome(string input)
 {
-	unordered_map <char, int> occurences;
+	unordered_set <char> oddOccurences;
 	
 	for (int i = 0; i < input.length(); i++)
 	{
-		if (occurences.find(input[i]) == occurences.end())
-			occurences.insert(make_pair(input[i], 1));
+		if (oddOccurences.find(input[i]) != oddOccurences.end())
+			oddOccurences.erase(input[i]);
 		else
-			occurences[input[i]]++;
+			oddOccurences.insert(input[i]);
 	}
 
-	unordered_map<char, int>::iterator it = occurences.begin();
-	bool singleOccurenceExists = false;
-	for (it; it <= occurences.end(); it++)
-	{
-		if (!singleOccurenceExists && it->second == 1)
-			singleOccurenceExists = true;
-		else if (singleOccurenceExists && it->second == 1)
-			return false;
-	}
-	return true;
+	return (oddOccurences.size() <= 1) ? 1 : 0;
 }
 
 int main()
