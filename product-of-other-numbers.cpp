@@ -24,23 +24,15 @@ vector <int> getProductsOfAllIntsExceptAtIndex(vector <int> input)
 		leftRunningProduct *= input[i];
 	}
 
-	// Products from right side
+	// Combine with right side to get final result
 	int rightRunningProduct = 1;
-	vector <int> rightProducts(input.size());
 	for (int i = input.size() - 1; i >= 0; i--)
 	{
-		rightProducts[i] = rightRunningProduct;
+		leftProducts[i] *= rightRunningProduct;
 		rightRunningProduct *= input[i];
 	}
 
-	// Combine to get final result
-	vector <int> output;
-	for (int i = 0; i < input.size(); i++)
-	{
-		output.push_back(leftProducts[i] * rightProducts[i]);
-	}
-
-	return output;
+	return leftProducts;
 }
 
 int main()
