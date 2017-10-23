@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -20,19 +21,18 @@ pair <int, int> getMaxPair(vector <int> arr)
 
 int getHighestProductOf3(vector <int> arr)
 {
-	int highestProduct = 1;
-	for (int i = 0; i < 3; i++)
-	{
-		pair <int, int> maxPair = getMaxPair(arr);
-		highestProduct *= maxPair.second;
-		arr.erase(arr.begin() + maxPair.first);
-	}
-	return highestProduct;
+	// Sort the array - O(nlogn)
+	sort(arr.begin(), arr.end());
+
+	// Return the greater of the two products (LHS and RHS) -> done to acount for positive products from negative numbers
+	int negProduct = arr[0] * arr[1] * arr[arr.size() - 1];
+	int posProduct = arr[arr.size() - 1] * arr[arr.size() - 2] * arr[arr.size() - 3];
+	return (negProduct > posProduct) ? negProduct : posProduct;
 }
 
 int main()
 {
-	vector <int> testInput = {1, 7, 3, 4, 6, 5, 2, 8};
+	vector <int> testInput = {-10, -10, 1, 3, 2};
 	cout << getHighestProductOf3(testInput) << endl;
 
 	return 0;
