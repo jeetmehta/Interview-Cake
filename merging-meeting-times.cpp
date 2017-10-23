@@ -66,7 +66,7 @@ vector <Meeting> mergeRanges(vector <Meeting> input)
 {
     vector <Meeting> output;
     vector <bool> partOfMerge(input.size(), false);
-    
+
     for (int i = 0; i < input.size(); i++)
     {
         Meeting currentMeeting = input[i];
@@ -75,7 +75,13 @@ vector <Meeting> mergeRanges(vector <Meeting> input)
 
         for (int j = i + 1; j < input.size(); j++)
         {
-            if (input[j].getStartTime() < endTime && input[j].getStartTime() > startTime)
+            if (currentMeeting == input[j])
+            {
+                output.push_back(currentMeeting);
+                partOfMerge[i] = true;
+                partOfMerge[j] = true;
+            }
+            else if (input[j].getStartTime() <= endTime && input[j].getStartTime() > startTime)
             {
                 output.push_back(Meeting(startTime, input[j].getEndTime()));
                 partOfMerge[i] = true;
@@ -96,7 +102,7 @@ vector <Meeting> mergeRanges(vector <Meeting> input)
 
 int main()
 {
-    vector <Meeting> testInput = {Meeting(0,1), Meeting(3,5), Meeting(4,8), Meeting(10,12), Meeting(9,10)};
+    vector <Meeting> testInput = {Meeting(1, 2), Meeting(2, 3)};
     print_meetings(mergeRanges(testInput));
 
     return 0;
