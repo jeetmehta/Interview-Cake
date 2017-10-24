@@ -50,6 +50,11 @@ public:
             startTime_ == other.startTime_
             && endTime_ == other.endTime_;
     }
+
+    bool operator< (const Meeting &other) const
+    {
+        return startTime_ < other.getStartTime();
+    }
 };
 
 void print_meetings(vector <Meeting> input)
@@ -64,61 +69,37 @@ void print_meetings(vector <Meeting> input)
 
 vector <Meeting> mergeRanges(vector <Meeting> input)
 {
+    // Sort meetings based on start time
+    sort(input.begin(), input.end());
+
+    // Initialize output
     vector <Meeting> output;
-    vector <bool> partOfMerge(input.size(), false);
 
-    for (int i = 0; i < input.size(); i++)
+    // Store first meeting
+    Meeting currentMeeting = input[0];
+    int startTime = input[0].getStartTime();
+    int endTime = input[0].getEndTime();
+    
+    // Go through remaining calendar and identify merges
+    for (int i = 1; i < input.size(); i++)
     {
-        Meeting currentMeeting = input[i];
-        int startTime = currentMeeting.getStartTime();
-        int endTime = currentMeeting.getEndTime();
-
-        // Check for merges with other meetings
-        for (int j = i + 1; j < input.size(); j++)
+        while (input[i].getStartTime() <= endTime && input[i].getStartTime() > startTime)
         {
-            if (!partOfMerge[j])
-            {
-                // Direct overlap - the same two intervals
-                if (currentMeeting == input[j])
-                {
-                    if (find(output.begin(), output.end(), currentMeeting) == output.end()) output.push_back(currentMeeting);
-                    partOfMerge[i] = true;
-                    partOfMerge[j] = true;
-                }
-                // One meeting consumses the other entirely
-                else if (input[j].getStartTime() >= startTime && input[j].getEndTime() < endTime)
-                {
-                    if (find(output.begin(), output.end(), currentMeeting) == output.end()) output.push_back(currentMeeting);
-                    partOfMerge[i] = true;
-                    partOfMerge[j] = true;
-                }
-                // Meeting partly overlaps on one side
-                else if (input[j].getStartTime() <= endTime && input[j].getStartTime() > startTime)
-                {
-                    if (find(output.begin(), output.end(), Meeting(startTime, input[j])) == output.end()) output.push_back(Meeting(startTime, input[j].getEndTime()));
-                    partOfMerge[i] = true;
-                    partOfMerge[j] = true;
-                }
-                // Meeting partly overlaps on the other
-                else if (input[j].getEndTime() < endTime && input[j].getEndTime() >= startTime)
-                {
-                    if (find(output.begin(), output.end(), Meeting(input[j].getStartTime(), endTime)) == output.end()) output.push_back(Meeting(input[j].getStartTime(), endTime));
-                    partOfMerge[i] = true;
-                    partOfMerge[j] = true;
-                }
-            }
+            endTime = (input[i].getEndTime() > endTime) ? input[i].getEndTime() : endTime;
+            i++;
         }
 
-        // No merge required
-        if (!partOfMerge[i])
-            output.push_back(currentMeeting);
+        output.push_back(Meeting(startTime, endTime));
+        startTime = input[i].getStartTime();
+        endTime = input[i].getEndTime();
     }
+    
     return output;
 }
 
 int main()
 {
-    vector <Meeting> testInput = {Meeting(1, 10), Meeting(2, 6), Meeting(3, 5), Meeting(7, 9)};
+    vector <Meeting> testInput = {Meeting(0, 1), Meeting(10, 12), Meeting(3, 5), Meeting(9, 10), Meeting(4, 8)};
     print_meetings(mergeRanges(testInput));
 
     return 0;
