@@ -102,6 +102,7 @@ bool checkPartialOverlap(Rectangle a, Rectangle b, int &intersectLeftX, int &int
     return false;
 }
 
+// Outputs the intersection between two given rectangles
 Rectangle getIntersection(Rectangle a, Rectangle b)
 {
     // Perfect Overlap - Perfect Intersection
