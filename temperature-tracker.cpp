@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stdio.h>
 #include <algorithm>
 #include <map>
 
@@ -8,11 +9,14 @@ using namespace std;
 class TempTracker
 {
 	private:
-		vector <int> temperatures;
-		map <int, int> freq;
+		int numTemps = 0;
 		int maxTemp = -1;
 		int minTemp = 111;
 		int runningSum = 0;
+		int lastTemp = -1;
+		int maxOccurences = 1;
+		int numOccurences = 1;
+		int mode = 1;
 
 	public:
 		TempTracker();
@@ -23,6 +27,8 @@ class TempTracker
 		int getMode();		
 };
 
+TempTracker::TempTracker(){};
+
 void TempTracker::insert(int temp)
 {
 	if (temp > maxTemp)
@@ -32,13 +38,19 @@ void TempTracker::insert(int temp)
 		minTemp = temp;
 
 	runningSum += temp;
+	numTemps++;
 
-	if (freq.find(temp) == freq.end())
-		freq.insert(make_pair(temp, 1));
-	else
-		freq[temp]++;
+	if (temp == lastTemp)
+		numOccurences++;
 
-	temperatures.push_back(temp);
+	if (numOccurences > maxOccurences)
+	{
+		maxOccurences = numOccurences;
+		mode = temp;
+	}
+
+	lastTemp = temp;
+
 }
 
 int TempTracker::getMax()
@@ -53,21 +65,26 @@ int TempTracker::getMin()
 
 double TempTracker::getMean()
 {
-	return (double)(runningSum / temperatures.size());
+    return double(runningSum) / double(numTemps);
 }
 
 int TempTracker::getMode()
 {
-    std::vector <pair <int, int>> results(1);
-	std::partial_sort_copy(
-    	freq.begin(), freq.end(), 
-    	results.begin(), results.end(), 
-    	[](const pair <int, int> &lhs, const pair <int, int> &rhs) { return lhs.second > rhs.second; }
-	);
-    return results[0].second;
+    return (mode > 1) ? mode : lastTemp;
 }
 
 int main()
 {
+	TempTracker tracker = TempTracker();
+	for (int i = 0; i < 4; i++)
+	{
+		tracker.insert(i);
+	}
+	
+	cout << "Max Temperature: " << tracker.getMax() << endl;
+	cout << "Min Temperature: " << tracker.getMin() << endl;
+	cout << "Mean Temperature: " << tracker.getMean() << endl;
+	cout << "Mode Temperature: " << tracker.getMode() << endl;
+
 	return 0;
 }
