@@ -68,31 +68,23 @@ public:
     }
 };
 
-Rectangle getIntersection(Rectangle a, Rectangle b)
+// Complete Consumption - Check if A consumes B
+bool checkConsumption(Rectangle a, Rectangle b)
 {
-    // Perfect Overlap - Perfect Intersection
-    if (a == b)
-        return Rectangle(a.getLeftX(), a.getBottomY(), a.getWidth(), a.getHeight());
-   
-    // No Overlap - Zero Intersection
-    else if (abs(a.getLeftX() - b.getLeftX()) > max(a.getWidth(), b.getWidth()) || abs(a.getBottomY() - b.getBottomY()) > max(a.getHeight(), b.getHeight()))
-        return Rectangle(a.getLeftX(), a.getBottomY(), -1, -1);
+    if ((b.getLeftX() >= a.getLeftX() && b.getLeftX() + b.getWidth() <= a.getLeftX() + a.getWidth()) && (b.getBottomY() >= a.getBottomY() && b.getBottomY() + b.getHeight() <= a.getBottomY() + a.getHeight()))
+        return true;
+    return false;
+}
 
-    // Complete Consumption - A consumes B -> Intersection = B
-    else if ((b.getLeftX() >= a.getLeftX() && b.getLeftX() + b.getWidth() <= a.getLeftX() + a.getWidth()) && (b.getBottomY() >= a.getBottomY() && b.getBottomY() + b.getHeight() <= a.getBottomY() + a.getHeight()))
-        return b;
-    
-    // Complete Consumption - B consumes A -> Intersection = A
-    else if ((a.getLeftX() >= b.getLeftX() && a.getLeftX() + a.getWidth() <= b.getLeftX() + b.getWidth()) && (a.getBottomY() >= b.getBottomY() && a.getBottomY() + a.getHeight() <= b.getBottomY() + b.getHeight()))
-        return a;
-
-    // Partial Overlap
-    else if (b.getLeftX() >= a.getLeftX() && b.getLeftX() <= a.getLeftX() + a.getWidth())
+// Partial Overlap - Check if A and B partially overlap - treats B as the smaller rectangle
+bool checkPartialOverlap(Rectangle a, Rectangle b, int &intersectLeftX, int &intersectBottomY, int &intersectWidth, int &intersectHeight)
+{
+    if (b.getLeftX() >= a.getLeftX() && b.getLeftX() <= a.getLeftX() + a.getWidth())
     {
-        int intersectLeftX = b.getLeftX();
-        int intersectBottomY = 0;
-        int intersectWidth = a.getLeftX() + a.getWidth() - b.getLeftX();
-        int intersectHeight = 0;
+        intersectLeftX = b.getLeftX();
+        intersectBottomY = 0;
+        intersectWidth = a.getLeftX() + a.getWidth() - b.getLeftX();
+        intersectHeight = 0;
 
         if (b.getBottomY() >= a.getBottomY() && b.getBottomY() <= a.getBottomY() + a.getHeight())
         {
@@ -105,28 +97,39 @@ Rectangle getIntersection(Rectangle a, Rectangle b)
             intersectBottomY = b.getBottomY() + b.getHeight() - intersectHeight;
         }
 
-        return Rectangle(intersectLeftX, intersectBottomY, intersectWidth, intersectHeight);
+        return true;
     }
+    return false;
+}
 
-    else if (a.getLeftX() >= b.getLeftX() && a.getLeftX() <= b.getLeftX() + b.getWidth())
+Rectangle getIntersection(Rectangle a, Rectangle b)
+{
+    // Perfect Overlap - Perfect Intersection
+    if (a == b)
+        return Rectangle(a.getLeftX(), a.getBottomY(), a.getWidth(), a.getHeight());
+   
+    // No Overlap - Zero Intersection
+    else if (abs(a.getLeftX() - b.getLeftX()) > max(a.getWidth(), b.getWidth()) || abs(a.getBottomY() - b.getBottomY()) > max(a.getHeight(), b.getHeight()))
+        return Rectangle(a.getLeftX(), a.getBottomY(), -1, -1);
+
+    // A consumes B -> Intersection = B
+    else if (checkConsumption(a, b))
+        return b;
+
+    // B consumes A -> Intersection = A
+    else if (checkConsumption(b, a))
+        return a;
+    
+    // Partial Overlap
+    else
     {
-        int intersectLeftX = a.getLeftX();
+        int intersectLeftX = 0;
         int intersectBottomY = 0;
-        int intersectWidth = b.getLeftX() + b.getWidth() - a.getLeftX();
+        int intersectWidth = 0;
         int intersectHeight = 0;
 
-        if (a.getBottomY() >= b.getBottomY() && a.getBottomY() <= b.getBottomY() + b.getHeight())
-        {
-            intersectHeight = b.getBottomY() + b.getHeight() - a.getBottomY();
-            intersectBottomY = a.getBottomY();
-        }
-        else
-        {
-            intersectHeight = a.getBottomY() + a.getHeight() - b.getBottomY();
-            intersectBottomY = a.getBottomY() + a.getHeight() - intersectHeight;
-        }
-
-        return Rectangle(intersectLeftX, intersectBottomY, intersectWidth, intersectHeight);
+        if (checkPartialOverlap(a, b, intersectLeftX, intersectBottomY, intersectWidth, intersectHeight) || checkPartialOverlap(b, a, intersectLeftX, intersectBottomY, intersectWidth, intersectHeight))
+            return Rectangle(intersectLeftX, intersectBottomY, intersectWidth, intersectHeight);
     }
 }
 
